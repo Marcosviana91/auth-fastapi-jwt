@@ -64,26 +64,26 @@ class UserUseCases:
 
         access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-        print(access_token)
-        # return {
-        #     'access_token': access_token,
-        #     'exp': exp.isoformat()
-        # }
+        return {
+            'access_token': access_token,
+            'exp': exp.isoformat()
+        }
 
-#     def verify_token(self, access_token):
-#         try:
-#             data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-#         except JWTError:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail='Invalid access token'
-#             )
+    def verify_token(self, access_token):
+        try:
+            data = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        except JWTError:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid access token'
+            )
         
 #         user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
+        user_on_db = self.db_session.get_User(data['sub'])
 
-#         if user_on_db is None:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail='Invalid access token'
-#             )
+        if user_on_db is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid access token'
+            )
 
