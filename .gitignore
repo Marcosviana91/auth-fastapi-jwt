@@ -1,2 +1,4 @@
 *__pycache__
 *venv
+.env
+db_server/user_auth_db.json

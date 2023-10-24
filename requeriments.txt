@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+tinydb
+pydantic
+python-decouple
+passlib
+python-jose
+python-multipart
