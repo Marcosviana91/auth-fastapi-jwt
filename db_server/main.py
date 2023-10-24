@@ -1,4 +1,3 @@
-# from sqlalchemy.orm import declarative_base
 from tinydb import  TinyDB, Query
 from pydantic import BaseModel
 
@@ -18,14 +17,18 @@ class users_DB:
         else:
             raise ValueError(f'"{new_user["username"]}" is not available')
 
-    def get_User(self, user_name: str)-> bool:
-        '''Search for a user_name and returns true if exist.'''
-        return bool(self.__db.search(self.__user_Search.username == user_name))
+    def get_User(self, user_name: str):
+        '''Search for a user_name and returns data if exist.'''
+        data = {}
+        try:
+            data = self.__db.search(self.__user_Search.username == user_name)[0]
+        except:
+            pass
+        return data
     
     # def verify_User_Pass(user: User):
     #     pass
 
-# Base = declarative_base()
 if __name__ == '__main__':
     print('rodando...')
     new_User = {}
@@ -33,6 +36,6 @@ if __name__ == '__main__':
     new_User['password'] = '123456'
     
     db = users_DB()
-    a= db.create_User(new_User)
-    # a = db.get_User('marcos')
+    # a= db.create_User(new_User)
+    a = db.get_User('marcos')
     print (a)

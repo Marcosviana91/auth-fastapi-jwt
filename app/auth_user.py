@@ -6,12 +6,12 @@ from app.db.connection import Session
 # from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-# from decouple import config
+from decouple import config
 # from app.db.models import UserModel
 from app.schemas import User
 
-# SECRET_KEY = config('SECRET_KEY')
-# ALGORITHM = config('ALGORITHM')
+SECRET_KEY = config('SECRET_KEY')
+ALGORITHM = config('ALGORITHM')
 
 crypt_context = CryptContext(schemes=['sha256_crypt'])
 
@@ -27,7 +27,7 @@ class UserUseCases:
             "password": crypt_context.hash(user.password)
         }
         try:
-            self.db_session.create_User(new_user)
+            return self.db_session.create_User(new_user)
 #             self.db_session.add(new_user)
 #             self.db_session.commit()
 #         except IntegrityError:
@@ -37,34 +37,38 @@ class UserUseCases:
                 detail='User already exists'
             )
 
-#     def user_login(self, user: User, expires_in: int = 30):
+    def user_login(self, user: User, expires_in: int = 90):
 #         user_on_db = self.db_session.query(UserModel).filter_by(username=user.username).first()
+        user_on_db = self.db_session.get_User(user['username'])
 
-#         if user_on_db is None:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail='Invalid username or password'
-#             )
+        if not user_on_db:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid username or password'
+            )
         
-#         if not crypt_context.verify(user.password, user_on_db.password):
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail='Invalid username or password'
-#             )
         
-#         exp = datetime.utcnow() + timedelta(minutes=expires_in)
+        
+        if not crypt_context.verify(user['password'], user_on_db['password']):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='Invalid username or password'
+            )
+        
+        exp = datetime.utcnow() + timedelta(minutes=expires_in)
 
-#         payload = {
-#             'sub': user.username,
-#             'exp': exp
-#         }
+        payload = {
+            'sub': user['username'],
+            'exp': exp
+        }
 
-#         access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+        access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-#         return {
-#             'access_token': access_token,
-#             'exp': exp.isoformat()
-#         }
+        print(access_token)
+        # return {
+        #     'access_token': access_token,
+        #     'exp': exp.isoformat()
+        # }
 
 #     def verify_token(self, access_token):
 #         try:
