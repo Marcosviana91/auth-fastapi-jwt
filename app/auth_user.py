@@ -1,13 +1,10 @@
 from datetime import datetime, timedelta
 from fastapi import status
 from fastapi.exceptions import HTTPException
-# from sqlalchemy.orm import Session
 from app.db.connection import Session
-# from sqlalchemy.exc import IntegrityError
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from decouple import config
-# from app.db.models import UserModel
 from app.schemas import User
 
 SECRET_KEY = config('SECRET_KEY')
@@ -16,7 +13,6 @@ ALGORITHM = config('ALGORITHM')
 crypt_context = CryptContext(schemes=['sha256_crypt'])
 
 class UserUseCases:
-    # def __init__(self, db_session: Session):
     def __init__(self):
         self.db_session = Session
 
@@ -28,9 +24,6 @@ class UserUseCases:
         }
         try:
             return self.db_session.create_User(new_user)
-#             self.db_session.add(new_user)
-#             self.db_session.commit()
-#         except IntegrityError:
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -38,7 +31,6 @@ class UserUseCases:
             )
 
     def user_login(self, user: User, expires_in: int = 90):
-#         user_on_db = self.db_session.query(UserModel).filter_by(username=user.username).first()
         user_on_db = self.db_session.get_User(user['username'])
 
         if not user_on_db:
@@ -78,7 +70,6 @@ class UserUseCases:
                 detail='Invalid access token'
             )
         
-#         user_on_db = self.db_session.query(UserModel).filter_by(username=data['sub']).first()
         user_on_db = self.db_session.get_User(data['sub'])
 
         if user_on_db is None:
